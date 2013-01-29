@@ -16,19 +16,18 @@ module.exports = function(grunt) {
     },
     qunit: {
       all: ['http://localhost:5984/garden-core/_design/garden-core-test/index.html']
-    },
-    server: {
-      port: 8000,
-      base: '.'
     }
   });
 
   // Create a new task.
   grunt.registerTask('kanso', 'kanso push test app', function() {
     var done = this.async();
+    var test_db = grunt.option('test_db') || 'http://127.0.0.1:5984/garden-core';
+
+
     grunt.utils.spawn({
       cmd:  'kanso',
-      args: ['push', 'http://localhost:5984/garden-core'],
+      args: ['push', test_db],
       opts: {
         cwd: './test/qunit'
       }

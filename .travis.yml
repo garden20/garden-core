@@ -11,6 +11,7 @@ before_script:
   - npm install mocha -g
   - npm install grunt -g
   - npm install
+  - curl -X PUT localhost:5984/garden-core
 
 
 script: "grunt lint mochaTest kanso qunit"
