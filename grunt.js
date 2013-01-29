@@ -28,7 +28,7 @@ module.exports = function(grunt) {
     var done = this.async();
     grunt.utils.spawn({
       cmd:  'kanso',
-      args: ['push', 'http://admin:admin@localhost:5984/garden-core'],
+      args: ['push', 'http://localhost:5984/garden-core'],
       opts: {
         cwd: './test/qunit'
       }
@@ -41,6 +41,6 @@ module.exports = function(grunt) {
 
 
   // Default task.
-  grunt.registerTask('default', 'lint mochaTest kanso qunit min');
+  grunt.registerTask('default', 'lint mochaTest min');
 
 };
