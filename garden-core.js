@@ -109,7 +109,6 @@ app.purgeDoc = function(couch_db_url, doc_id, callback) {
     var purge_url = url.resolve(couch_db_url, './_purge');
     couchr.head(doc_url, function(err, res, req){
         if (err) return callback(err);
-        console.log(req);
         var rev = findEtag(req);
         var data = {};
         data[doc_id] = [rev];

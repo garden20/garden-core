@@ -3,7 +3,7 @@ var url = require('url');
 module.exports = function(grunt) {
 
 
-  var test_db = grunt.option('test_db') || 'http://127.0.0.1:5984/garden-core',
+  var test_db = grunt.option('test_db') || 'http://localhost:5984/garden-core',
       test_url = test_db + '/_design/garden-core-test/index.html';
 
 

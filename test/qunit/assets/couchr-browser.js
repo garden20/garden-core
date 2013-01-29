@@ -26,7 +26,6 @@
      */
 
     function onComplete(options, callback) {
-        console.log(options, callback);
         return function (req) {
             var resp;
             if (ctype = req.getResponseHeader('Content-Type')) {
