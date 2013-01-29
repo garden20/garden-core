@@ -1,0 +1,17 @@
+{
+  "name": "garden-app-install",
+  "description": "Small api to intall and update a garden app",
+  "tags": ["garden", "couchdb", "couchapp"],
+  "version": "0.0.1",
+  "author": "Ryan Ramage",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/garden20/garden-app-install.git"
+  },
+  "bugs": "https://github.com/garden20/garden-app-install/issues",
+  "main": "index.js",
+  "dependencies": {
+    "couchr": "0.0.9",
+    "async": "0.1.22"
+  }
+}
