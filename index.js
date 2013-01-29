@@ -21,23 +21,28 @@ app.std_options = {
     update_status_function: function(msg, percent) {},
     add_vhost_entries: false,
     vhost_hostnames: [],
-    opts : null,
     vhost_path: null
 };
 
 
-app.install = function(couch_root_url, src_db, doc_id, new_db_name, options, callback) {
+app.install_market = function(market_json, to_couch_root_url, db_name, options, callback) {
+    options.app_details = market_json;
+    options.vhost_path  = '/' + db_name + '/_design/' + market_json.doc_id + '/' + market_json.open_path;
+    app.install(market_json.db_src, market_json.doc_id, to_couch_root_url, db_name, options, callback);
+};
+
+app.install = function(src_db, doc_id, couch_root_url, db_name, options, callback) {
   // allow options to be skipped passing in
   if (!callback) callback = options;
     if (!endsWith(couch_root_url, '/')) couch_root_url += '/';
     var opts = process_options(options),
         dashboad_db_url = resolve(couch_root_url, opts.dashboard_db_name);
-        couch_db_url = resolve(couch_root_url, new_db_name);
+        couch_db_url = resolve(couch_root_url, db_name);
 
     opts.update_status_function('Installing App', '30%');
     async.waterfall([
         function(callback) {
-            app.replicate(couch_root_url, src_db, new_db_name, doc_id, callback);
+            app.replicate(couch_root_url, src_db, db_name, doc_id, callback);
         },
         function(callback) {
             opts.update_status_function('Configuring App', '60%');
@@ -49,7 +54,7 @@ app.install = function(couch_root_url, src_db, doc_id, new_db_name, options, cal
         },
         function(callback) {
             opts.update_status_function('Recording Install', '85%');
-            app.saveAppDetails(dashboad_db_url, new_db_name, opts.app_details, callback);
+            app.saveAppDetails(dashboad_db_url, db_name, opts.app_details, callback);
         },
         function(callback) {
             opts.update_status_function('Setting security', '90%', true);
