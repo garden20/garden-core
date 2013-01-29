@@ -36,7 +36,7 @@ app.install = function(src_db, doc_id, couch_root_url, db_name, options, callbac
   if (!callback) callback = options;
     if (!endsWith(couch_root_url, '/')) couch_root_url += '/';
     var opts = app.process_options(options),
-        dashboad_db_url = url.resolve(couch_root_url, opts.dashboard_db_name);
+        dashboad_db_url = url.resolve(couch_root_url, opts.dashboard_db_name),
         couch_db_url = url.resolve(couch_root_url, db_name);
 
     opts.update_status_function('Installing App', '30%');
@@ -45,8 +45,11 @@ app.install = function(src_db, doc_id, couch_root_url, db_name, options, callbac
             app.replicate(couch_root_url, src_db, db_name, doc_id, callback);
         },
         function(callback) {
+            app.verify_doc_exists(couch_db_url, doc_id, callback);
+        },
+        function(callback) {
             opts.update_status_function('Configuring App', '60%');
-            app.copyDoc(couch_db_url, doc_id, '_design/' + doc_id, false, callback);
+            app.copyDoc(couch_db_url, doc_id, '_design/' + doc_id, true, callback);
         },
         function(callback) {
             opts.update_status_function('Cleaning Up', '70%');
@@ -85,19 +88,38 @@ app.replicate = function(couch_root_url, src_db, target_db, doc_id, callback) {
 };
 
 
+app.verify_doc_exists = function(couch_db_url, doc_id, callback) {
+  if (!endsWith(couch_db_url, '/')) couch_db_url += '/';
+  var doc_url = url.resolve(couch_db_url,  doc_id);
+  couchr.head(doc_url, function(err, res, req){
+        if (err) {
+          if (err.response && err.response.statusCode === 404) {
+            return callback('App has not been updated, install aborting');
+          }
+          return callback(err);
+        }
+        callback(null);
+  });
+};
+
 
 app.copyDoc = function(couch_db_url, from_doc_id, to_doc_id, update, callback) {
     if (!endsWith(couch_db_url, '/')) couch_db_url += '/';
-    var doc_url = url.resolve(couch_db_url,  from_doc_id),
+    var from_doc_url = url.resolve(couch_db_url,  from_doc_id),
+        to_doc_url = url.resolve(couch_db_url,  to_doc_id),
         dest = to_doc_id;
+    if (!update) return couchr.copy(from_doc_url, dest, callback);
 
-    if (!update) return couchr.copy(doc_url, dest, callback);
-
-    couchr.head(doc_url, function(err, res, req){
-        if (err) return callback(err);
+    couchr.head(to_doc_url, function(err, res, req){
+        if (err) {
+          if (err.response && err.response.statusCode === 404) {
+            return couchr.copy(from_doc_url, dest, callback);
+          }
+          return callback(err);
+        }
         var rev = findEtag(req);
         dest += "?rev=" + rev;
-        return couchr.copy(doc_url, dest, callback);
+        return couchr.copy(from_doc_url, dest, callback);
     });
 };
 
@@ -109,15 +131,16 @@ app.purgeDoc = function(couch_db_url, doc_id, callback) {
     var purge_url = url.resolve(couch_db_url, './_purge');
     couchr.head(doc_url, function(err, res, req){
         if (err) return callback(err);
-        var rev = findEtag(req);
+        var rev = findEtag(req, res);
         var data = {};
+
         data[doc_id] = [rev];
         couchr.post(purge_url, data, callback);
     });
 };
 
 
-function findEtag(req) {
+function findEtag(req, res) {
   if (req.headers) {
     return req.headers.etag.replace(/"/gi, '');
   }

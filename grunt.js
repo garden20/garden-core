@@ -13,7 +13,15 @@ module.exports = function(grunt) {
       all: ['garden-core.js']
     },
     mochaTest: {
-      files: ['test/test.js']
+        quick: ['test/test.js'],
+        travis: ['test/install-travis-test.js']
+    },
+    mochaTestConfig: {
+      travis: {
+        options: {
+          timeout: 10000
+        }
+      }
     },
     min: {
       dist: {
@@ -50,6 +58,7 @@ module.exports = function(grunt) {
 
 
   // Default task.
-  grunt.registerTask('default', 'lint mochaTest min');
+  grunt.registerTask('default', 'lint mochaTest:quick min');
+  grunt.registerTask('release', 'lint mochaTest:quick concat kanso qunit min');
 
 };
