@@ -1,7 +1,11 @@
+var url = require('url');
+
 module.exports = function(grunt) {
 
+
   var test_db = grunt.option('test_db') || 'http://127.0.0.1:5984/garden-core',
-    test_url = test_db + '/_design/garden-core-test/index.html';
+      test_url = test_db + '/_design/garden-core-test/index.html';
+
 
   // Project configuration.
   grunt.initConfig({
@@ -17,6 +21,12 @@ module.exports = function(grunt) {
         dest: './garden-core.min.js'
       }
     },
+    concat: {
+        dist: {
+          src: ['./garden-core.js'],
+          dest: 'test/qunit/assets/garden-core.js'
+        }
+     },
     qunit: {
       all: [test_url]
     }
