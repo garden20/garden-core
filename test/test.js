@@ -11,7 +11,7 @@ var couchrMock = {
 };
 
 requireMock.mock("couchr", couchrMock);
-var install = requireMock("../index.js");
+var install = requireMock("../garden-core.js");
 
 
 describe('Options', function(){

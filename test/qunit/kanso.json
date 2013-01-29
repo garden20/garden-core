@@ -1,0 +1,9 @@
+{
+    "name": "garden-core-test",
+    "version": "0.0.1",
+    "description": "A simple test app for garden-core",
+    "attachments": ["index.html", "tests.js", "assets"],
+    "dependencies": {
+        "attachments": null
+    }
+}

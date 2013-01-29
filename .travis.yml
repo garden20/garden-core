@@ -10,9 +10,10 @@ before_script:
   - npm install kanso -g
   - npm install mocha -g
   - npm install grunt -g
+  - npm install
 
 
-script: "grunt"
+script: "grunt lint mochaTest kanso qunit"
 
 
 notifications:
