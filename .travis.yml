@@ -14,7 +14,7 @@ before_script:
   - curl -X PUT localhost:5984/garden-core
 
 
-script: "grunt lint mochaTest kanso qunit"
+script: "grunt lint mochaTest kanso qunit --debug"
 
 
 notifications:

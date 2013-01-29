@@ -1,5 +1,8 @@
 module.exports = function(grunt) {
 
+  var test_db = grunt.option('test_db') || 'http://127.0.0.1:5984/garden-core',
+    test_url = test_db + '/_design/garden-core-test/index.html';
+
   // Project configuration.
   grunt.initConfig({
     lint: {
@@ -15,16 +18,13 @@ module.exports = function(grunt) {
       }
     },
     qunit: {
-      all: ['http://localhost:5984/garden-core/_design/garden-core-test/index.html']
+      all: [test_url]
     }
   });
 
   // Create a new task.
   grunt.registerTask('kanso', 'kanso push test app', function() {
     var done = this.async();
-    var test_db = grunt.option('test_db') || 'http://127.0.0.1:5984/garden-core';
-
-
     grunt.utils.spawn({
       cmd:  'kanso',
       args: ['push', test_db],
