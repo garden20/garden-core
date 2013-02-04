@@ -11,7 +11,7 @@
   "bugs": "https://github.com/garden20/garden-core/issues",
   "main": "garden-core.js",
   "dependencies": {
-    "couchr": "0.0.9",
+    "couchr": "0.0.11",
     "async": "0.1.22"
   },
   "devDependencies": {
