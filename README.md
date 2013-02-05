@@ -3,7 +3,7 @@ Garden-Core
 
 Small surface api to install, update and manage garden apps. Use in node, requirejs, and browser global.
 
-[![Build Status](https://secure.travis-ci.org/ryanramage/garden-core.png)](http://travis-ci.org/ryanramage/garden-core)
+[![Build Status](https://secure.travis-ci.org/garden20/garden-core.png)](http://travis-ci.org/garden20/garden-core)
 
 
 Node usage
