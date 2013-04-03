@@ -9,7 +9,7 @@ services:
 before_script:
   - npm install kanso -g
   - npm install mocha -g
-  - npm install grunt -g
+  - npm install grunt@0.3.18 -g
   - npm install
   - curl -X PUT localhost:5984/garden-core
 
