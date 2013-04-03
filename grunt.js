@@ -36,7 +36,11 @@ module.exports = function(grunt) {
         }
      },
     qunit: {
-      all: [test_url]
+      all: ['http://localhost:8000/test/qunit/index.html']
+    },
+    server: {
+      port: 8000,
+      base: '.'
     }
   });
 

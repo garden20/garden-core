@@ -37,10 +37,17 @@ app.install = function(src_db, doc_id, couch_root_url, db_name, options, callbac
     if (!endsWith(couch_root_url, '/')) couch_root_url += '/';
     var opts = app.process_options(options),
         dashboad_db_url = url.resolve(couch_root_url, opts.dashboard_db_name),
+        current_app_settings,
         couch_db_url = url.resolve(couch_root_url, db_name);
 
     opts.update_status_function('Installing App', '30%');
     async.series([
+        function(callback) {
+            app.gather_current_settings(couch_db_url, '_design/' + doc_id, function(err, settings) {
+                current_app_settings = settings;
+                return callback();
+            });
+        },
         function(callback) {
             app.replicate(couch_root_url, src_db, db_name, doc_id, callback);
         },
@@ -50,6 +57,9 @@ app.install = function(src_db, doc_id, couch_root_url, db_name, options, callbac
         function(callback) {
             opts.update_status_function('Configuring App', '60%');
             app.copyDoc(couch_db_url, doc_id, '_design/' + doc_id, true, callback);
+        },
+        function(callback) {
+            app.apply_settings(couch_db_url, '_design/' + doc_id, current_app_settings, callback);
         },
         function(callback) {
             opts.update_status_function('Cleaning Up', '70%');
@@ -317,6 +327,26 @@ app.process_options = function(options) {
     };
     return opts;
 };
+
+app.gather_current_settings = function(couch_db_url, ddoc_id, cb) {
+  var doc_url = url.resolve(couch_db_url,  ddoc_id);
+  couchr.get(doc_url, function(err, doc){
+    if (err) return cb(err);
+    cb (null, doc.app_settings);
+  });
+};
+
+app.apply_settings = function(couch_db_url, ddoc_id, app_settings, cb) {
+  if (!app_settings) return cb(null);
+  var doc_url = url.resolve(couch_db_url,  ddoc_id);
+  couchr.get(doc_url, function(err, doc){
+    if (err) return cb(err);
+    doc.app_settings = app_settings;
+    couchr.put(doc_url, doc, cb);
+  });
+};
+
+
 
 function endsWith(str, suffix) {
     return str.indexOf(suffix, str.length - suffix.length) !== -1;
