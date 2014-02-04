@@ -6,6 +6,12 @@ Small surface api to install, update and manage garden apps. Use in node, requir
 [![Build Status](https://secure.travis-ci.org/garden20/garden-core.png)](http://travis-ci.org/garden20/garden-core)
 
 
+Command-line
+-------------
+
+    node ./bin/garden-core http://medic-dev.iriscouch.com/market/details/kujua-lite  http://admin:admin@localhost:5984
+
+
 Node usage
 ----------
 
