@@ -1,0 +1,30 @@
+#!/usr/bin/env node
+
+var url = require('url'),
+    couchr = require('couchr'),
+    core = require('../garden-core');
+
+var app = process.argv[2],
+    couch_url  = process.argv[3] || 'http://localhost:5984/',
+    market_url = process.argv[4] || 'http://garden20.com/market/details/',
+    local_name = process.argv[5] || app;
+
+//console.log('installing', app, 'from', market_db_url, 'into', couch_url, 'db named', local_name)
+
+var app_url = url.resolve(market_url, app + '/json');
+couchr.get(app_url, function(err, app_details){
+  if (err) return console.log('Could not retrieve app details', err);
+
+  app_details.src = app_url;
+  var options = {
+    dashboard_db_name: 'dashboard',
+    update_status_function: function(msg, percent) {
+        console.log(percent, msg);
+    }
+  }
+
+  core.install_market(app_details, couch_url, local_name, options, function(err){
+    console.log(err);
+  });
+
+});
