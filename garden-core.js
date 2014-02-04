@@ -38,6 +38,7 @@ app.install = function(src_db, doc_id, couch_root_url, db_name, options, callbac
     var opts = app.process_options(options),
         dashboad_db_url = url.resolve(couch_root_url, opts.dashboard_db_name),
         current_app_settings,
+        replication_id,
         couch_db_url = url.resolve(couch_root_url, db_name);
 
     opts.update_status_function('Installing App', '30%');
@@ -49,7 +50,26 @@ app.install = function(src_db, doc_id, couch_root_url, db_name, options, callbac
             });
         },
         function(callback) {
-            app.replicate(couch_root_url, src_db, db_name, doc_id, callback);
+            app.replicate(couch_root_url, src_db, db_name, doc_id, function(err, resp){
+              if (err) callback(err);
+              replication_id = resp.id;
+              callback(null);
+            });
+        },
+        function(callback) {
+          var is_done = false;
+          async.until(
+            function(){ return is_done },
+            function(cb) {
+              app.is_replication_complete(couch_root_url, replication_id, function(err, done){
+                if (err) return cb(err);
+                is_done = done;
+                if (done) return cb(null);
+                setTimeout( function(){ cb(null) }, 1000);
+              })
+            },
+            callback
+          )
         },
         function(callback) {
             app.verify_doc_exists(couch_db_url, doc_id, callback);
@@ -87,16 +107,34 @@ app.install = function(src_db, doc_id, couch_root_url, db_name, options, callbac
 
 
 app.replicate = function(couch_root_url, src_db, target_db, doc_id, callback) {
-  var replicate_url = url.resolve(couch_root_url, '/_replicate'),
+  var replicate_url = url.resolve(couch_root_url, '/_replicator'),
     data = {
         source: src_db,
         target: target_db,
         create_target:true,
-        doc_ids : [doc_id]
+        doc_ids : [doc_id],
+        use_checkpoints: true,
+        user_ctx: {
+          name: 'admin',
+          roles: ['_admin']
+        }
     };
     couchr.post(replicate_url, data, callback);
 };
 
+app.is_replication_complete = function(couch_root_url, replication_id, callback) {
+  var replicate_url = url.resolve(couch_root_url, '/_replicator/' + replication_id);
+  couchr.get(replicate_url, function(err, repl_doc){
+    if (err) return callback(err);
+
+    if (repl_doc._replication_state === 'error') return callback('error', repl_doc._replication_stats);
+
+    var complete = false;
+    if (repl_doc._replication_state == 'completed') complete = true;
+    callback(null, complete);
+
+  })
+}
 
 app.verify_doc_exists = function(couch_db_url, doc_id, callback) {
   if (!endsWith(couch_db_url, '/')) couch_db_url += '/';
