@@ -9,7 +9,7 @@ Small surface api to install, update and manage garden apps. Use in node, requir
 Command-line
 -------------
 
-    node ./bin/garden-core http://medic-dev.iriscouch.com/market/details/kujua-lite  http://admin:admin@localhost:5984
+    ./bin/garden-core http://medic-dev.iriscouch.com/market/details/kujua-lite  http://admin:admin@localhost:5984
 
 
 Node usage

@@ -44,6 +44,9 @@ app.install = function(src_db, doc_id, couch_root_url, db_name, options, callbac
     opts.update_status_function('Installing App', '30%');
     async.series([
         function(callback) {
+          app.create_dashboard_db_if_needed(dashboad_db_url, callback);
+        },
+        function(callback) {
             app.gather_current_settings(couch_db_url, '_design/' + doc_id, function(err, settings) {
                 current_app_settings = settings;
                 return callback();
@@ -104,6 +107,14 @@ app.install = function(src_db, doc_id, couch_root_url, db_name, options, callbac
         callback(err);
     });
 };
+
+
+app.create_dashboard_db_if_needed = function(dashboad_db_url, callback) {
+  couchr.get(dashboad_db_url, function(err, resp){
+    if (err && err.error === 'not_found') return couchr.put(dashboad_db_url, callback);
+    callback(err, resp);
+  })
+}
 
 
 app.replicate = function(couch_root_url, src_db, target_db, doc_id, callback) {
