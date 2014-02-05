@@ -12,7 +12,10 @@ if (!app_url) return usage();
 
 
 couchr.get(app_url_json, function(err, app_details){
-  if (err) return console.log('Could not retrieve app details', err);
+  if (err) {
+    console.log('Could not retrieve app details', err);
+    process.exit(1);
+  }
 
   app_details.src = app_url;
   var options = {
@@ -22,7 +25,10 @@ couchr.get(app_url_json, function(err, app_details){
   }
 
   core.install_market(app_details, couch_url, app_details.doc_id, options, function(err){
-    if (err) return console.log(err);
+    if (err) {
+      console.log(err);
+      process.exit(1);
+    }
   });
 
 });

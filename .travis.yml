@@ -7,14 +7,9 @@ services:
   - couchdb
 
 before_script:
-  - npm install kanso -g
-  - npm install mocha -g
-  - npm install grunt@0.3.16 -g
   - npm install
-  - curl -X PUT localhost:5984/garden-core
 
-
-script: "grunt lint mochaTest min"
+script: "./bin/garden-core http://garden20.com/market/details/answers"
 
 
 notifications:
