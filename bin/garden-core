@@ -8,12 +8,14 @@ var app_url = process.argv[2],
     couch_url  = process.argv[3] || 'http://localhost:5984/',
     app_url_json = app_url + '/json';
 
+if (!app_url) return usage();
+
+
 couchr.get(app_url_json, function(err, app_details){
   if (err) return console.log('Could not retrieve app details', err);
 
   app_details.src = app_url;
   var options = {
-    dashboard_db_name: 'dashboard',
     update_status_function: function(msg, percent) {
         console.log(percent, msg);
     }
@@ -27,3 +29,10 @@ couchr.get(app_url_json, function(err, app_details){
 
 
 
+function usage(){
+  console.log("\nUsage: garden-core <url> [couch]");
+  console.log("\nWhere:");
+  console.log("<url> is a garden app url, like http://garden20.com/market/details/answers")
+  console.log("[couch] is the optional couchdb to install to. Defaults to http://localhost:5984")
+
+}
