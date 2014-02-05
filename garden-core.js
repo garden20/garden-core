@@ -44,7 +44,7 @@ app.install = function(src_db, doc_id, couch_root_url, db_name, options, callbac
     opts.update_status_function('Installing App', '30%');
     async.series([
         function(callback) {
-          app.create_dashboard_db_if_needed(dashboad_db_url, callback);
+          app.create_db_if_needed(dashboad_db_url, callback);
         },
         function(callback) {
             app.gather_current_settings(couch_db_url, '_design/' + doc_id, function(err, settings) {
@@ -54,25 +54,13 @@ app.install = function(src_db, doc_id, couch_root_url, db_name, options, callbac
         },
         function(callback) {
             app.replicate(couch_root_url, src_db, db_name, doc_id, function(err, resp){
-              if (err) callback(err);
+              if (err) return callback(err);
               replication_id = resp.id;
               callback(null);
             });
         },
         function(callback) {
-          var is_done = false;
-          async.until(
-            function(){ return is_done },
-            function(cb) {
-              app.is_replication_complete(couch_root_url, replication_id, function(err, done){
-                if (err) return cb(err);
-                is_done = done;
-                if (done) return cb(null);
-                setTimeout( function(){ cb(null) }, 1000);
-              })
-            },
-            callback
-          )
+          app.ensure_doc_locally(couch_root_url, src_db, db_name, doc_id, replication_id, opts, callback);
         },
         function(callback) {
             app.verify_doc_exists(couch_db_url, doc_id, callback);
@@ -109,9 +97,47 @@ app.install = function(src_db, doc_id, couch_root_url, db_name, options, callbac
 };
 
 
-app.create_dashboard_db_if_needed = function(dashboad_db_url, callback) {
-  couchr.get(dashboad_db_url, function(err, resp){
-    if (err && err.error === 'not_found') return couchr.put(dashboad_db_url, callback);
+app.ensure_doc_locally = function(couch_root_url, src_db, db_name, doc_id, replication_id, opts, callback){
+  var is_done = false,
+      failed_replication = false,
+      start = new Date().getTime();
+
+  async.until(
+    function(){ return is_done },
+    function(cb) {
+      var now = new Date().getTime(),
+          when = start + opts.switch_strategy_timeout;
+
+      var timeout = now > when;
+      if (failed_replication || timeout) {
+        opts.update_status_function('Replication timeout', '40%');
+
+        opts.update_status_function('Falling back to memory transfer', '40%');
+        return app.transfer_doc(couch_root_url, src_db, db_name, doc_id, function(err){
+          if (err) return cb(err);
+          is_done = true;
+          return cb(null);
+        })
+      }
+
+      app.is_replication_complete(couch_root_url, replication_id, function(err, done){
+        if (err) {
+          failed_replication = true;
+          return cb(null);
+        }
+        is_done = done;
+        if (done) return cb(null);
+        setTimeout( function(){ cb(null) }, 1000);
+      })
+    },
+    callback
+  )
+}
+
+
+app.create_db_if_needed = function(db_url, callback) {
+  couchr.get(db_url, function(err, resp){
+    if (err && err.error === 'not_found') return couchr.put(db_url, callback);
     callback(err, resp);
   })
 }
@@ -146,6 +172,24 @@ app.is_replication_complete = function(couch_root_url, replication_id, callback)
 
   })
 }
+
+app.transfer_doc = function(couch_root_url, src_db, db_name, doc_id, callback) {
+  var doc_url_src = src_db +  '/' + doc_id,
+      dst_db = couch_root_url + '/' + db_name,
+      doc_url_dst = dst_db + '/' + doc_id;
+
+  app.create_db_if_needed(dst_db, function(err){
+    if (err) return callback(err);
+    couchr.get(doc_url_src, {attachments: 'true'}, function(err, doc){
+      if (err) return callback(err);
+      delete doc._rev;
+      couchr.put(doc_url_dst, doc, callback);
+    })
+  })
+}
+
+
+
 
 app.verify_doc_exists = function(couch_db_url, doc_id, callback) {
   if (!endsWith(couch_db_url, '/')) couch_db_url += '/';
@@ -365,6 +409,7 @@ app.install_app_vhosts = function (couch_root_url, hosts, vhost_short_name, vhos
 app.process_options = function(options) {
     if (!options) return app.std_options;
     var opts = {
+        switch_strategy_timeout: options.switch_strategy_timeout || 60000,
         app_details: options.app_details || {},
         dashboard_db_name: options.dashboard_db_name || app.std_options.dashboard_db_name,
         install_with_no_reader: options.install_with_no_reader || app.std_options.install_with_no_reader,

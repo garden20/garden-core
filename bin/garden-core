@@ -24,7 +24,7 @@ couchr.get(app_url_json, function(err, app_details){
     }
   }
 
-  core.install_market(app_details, couch_url, app_details.doc_id, options, function(err){
+  core.install_market(app_details, couch_url, app_details.doc_id.toLowerCase(), options, function(err){
     if (err) {
       console.log(err);
       process.exit(1);
