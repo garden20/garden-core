@@ -2,7 +2,7 @@
   "name": "garden-core",
   "description": "Small api to install, update and manage garden apps",
   "tags": ["garden", "couchdb", "couchapp"],
-  "version": "0.0.4",
+  "version": "0.0.5",
   "author": "Ryan Ramage",
   "repository": {
     "type": "git",

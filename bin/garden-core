@@ -24,7 +24,9 @@ couchr.get(app_url_json, function(err, app_details){
     }
   }
 
-  core.install_market(app_details, couch_url, app_details.doc_id.toLowerCase(), options, function(err){
+  var db_name = process.argv[4] ||  app_details.doc_id.toLowerCase();
+
+  core.install_market(app_details, couch_url, db_name, options, function(err){
     if (err) {
       console.log(err);
       process.exit(1);
@@ -36,9 +38,9 @@ couchr.get(app_url_json, function(err, app_details){
 
 
 function usage(){
-  console.log("\nUsage: garden-core <url> [couch]");
+  console.log("\nUsage: garden-core <url> [couch] [dbname]");
   console.log("\nWhere:");
   console.log("<url> is a garden app url, like http://garden20.com/market/details/answers")
   console.log("[couch] is the optional couchdb to install to. Defaults to http://localhost:5984")
-
+  console.log('[dbname] is optional. You can install the same app into different named dbs');
 }
