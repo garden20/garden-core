@@ -111,7 +111,6 @@ app.ensure_doc_locally = function(couch_root_url, src_db, db_name, doc_id, repli
       var timeout = now > when;
       if (failed_replication || timeout) {
         opts.update_status_function('Replication timeout', '40%');
-
         opts.update_status_function('Falling back to memory transfer', '40%');
         return app.transfer_doc(couch_root_url, src_db, db_name, doc_id, function(err){
           if (err) return cb(err);
