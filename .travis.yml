@@ -1,22 +1,17 @@
 language: node_js
+
 node_js:
    - 0.8
-
 
 services:
   - couchdb
 
 before_script:
-  - npm install kanso -g
-  - npm install mocha -g
-  - npm install grunt@0.3.16 -g
   - npm install
-  - curl -X PUT localhost:5984/garden-core
 
-
-script: "grunt lint mochaTest min"
-
+script: "npm test && mocha --timeout 30000 test/install-travis-test.js"
 
 notifications:
   email:
+    - dev@medicmobile.org
     - ryan.ramage@gmail.com

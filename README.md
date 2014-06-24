@@ -6,10 +6,18 @@ Small surface api to install, update and manage garden apps. Use in node, requir
 [![Build Status](https://secure.travis-ci.org/garden20/garden-core.png)](http://travis-ci.org/garden20/garden-core)
 
 
+Install
+-------
+
+    npm install garden-core -g
+
+Command-line
+-------------
+
+    garden-core http://medic-dev.iriscouch.com/market/details/kujua-lite  http://admin:admin@localhost:5984
+
 Node usage
 ----------
-
-```npm install garden-core```
 
 ```
 var garden_core = require('garden-core');

@@ -35,19 +35,19 @@ describe('Options', function(){
 describe('Replication', function () {
     it('calls replicate with the correct url and data', function () {
         couchrMock.post = function(url, data, callback) {
-            assert.equal(url, 'http://127.0.0.1/_replicate');
-            assert.deepEqual(data, {
-                source: 'http://garden20.com/market',
-                target: 'app',
-                create_target:true,
-                doc_ids : ['app']
-            });
+            assert.equal(url, 'http://127.0.0.1/_replicator');
+            // Couchdb 1.6 defaults include `"use_checkpoints": true`, so
+            // testing properties rather than entire object.
+            assert.equal(data.source, 'http://garden20.com/market');
+            assert.equal(data.target, 'app');
+            assert.equal(data.create_target, true);
+            assert.deepEqual(data.doc_ids, ['app']);
         };
         install.replicate("http://127.0.0.1/", "http://garden20.com/market", "app", "app", "callback");
     });
     it('should send supplied credentials', function () {
         couchrMock.post = function(url, data, callback) {
-            assert.equal(url, 'http://admin:admin@127.0.0.1/_replicate');
+            assert.equal(url, 'http://admin:admin@127.0.0.1/_replicator');
         };
         install.replicate("http://admin:admin@127.0.0.1/", "http://garden20.com/market", "app", "app", "callback");
     });

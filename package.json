@@ -2,16 +2,25 @@
   "name": "garden-core",
   "description": "Small api to install, update and manage garden apps",
   "tags": ["garden", "couchdb", "couchapp"],
-  "version": "0.0.2",
+  "version": "0.0.5",
   "author": "Ryan Ramage",
   "repository": {
     "type": "git",
     "url": "https://github.com/garden20/garden-core.git"
   },
+  "bin": {
+    "garden-core": "./bin/garden-core"
+  },
   "bugs": "https://github.com/garden20/garden-core/issues",
   "main": "garden-core.js",
   "dependencies": {
-    "couchr": "0.0.12",
-    "async": "0.2.5"
+    "couchr": "~0.0.14",
+    "async": "~0.2"
+  },
+  "devDependencies": {
+    "mocha": "~1.20"
+  },
+  "scripts": {
+    "test": "mocha test/test.js"
   }
 }
