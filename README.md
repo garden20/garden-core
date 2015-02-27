@@ -14,7 +14,7 @@ Install
 Command-line
 -------------
 
-    garden-core http://medic-dev.iriscouch.com/market/details/kujua-lite  http://admin:admin@localhost:5984
+    garden-core http://garden20.com/market/details/answers http://admin:secret@localhost:5984
 
 Node usage
 ----------
