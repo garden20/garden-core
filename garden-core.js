@@ -412,7 +412,7 @@ app.install_app_vhosts = function (couch_root_url, hosts, vhost_short_name, vhos
 app.process_options = function(options) {
     if (!options) return app.std_options;
     var opts = {
-        switch_strategy_timeout: options.switch_strategy_timeout || 60000,
+        switch_strategy_timeout: options.switch_strategy_timeout || 300000,
         app_details: options.app_details || {},
         dashboard_db_name: options.dashboard_db_name || app.std_options.dashboard_db_name,
         install_with_no_reader: options.install_with_no_reader || app.std_options.install_with_no_reader,
