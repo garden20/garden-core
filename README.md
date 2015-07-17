@@ -80,6 +80,9 @@ install(src_db, doc_id, couch_root_url, db_name, options, callback);
     - add_vhost_entries: add a vhost entry for the application. default is false.
     - vhost_hostnames: hostnames to used for the vhost entry. eg ['my.domain.com']. default is []
     - vhost_path: the full path to the design doc, eg '/bookmarks/_design/bookmarks/_rewrite/'
+    - switch_strategy_timeout: seconds to wait before switching from CouchDB
+      replication to in memory transfer during installs.
+
 
 
 Licenece: MIT

@@ -32,9 +32,13 @@ app.install_market = function(market_json, to_couch_root_url, db_name, options, 
 };
 
 app.install = function(src_db, doc_id, couch_root_url, db_name, options, callback) {
-  // allow options to be skipped passing in
-  if (!callback) callback = options;
-    if (!endsWith(couch_root_url, '/')) couch_root_url += '/';
+    // allow options to be skipped passing in
+    if (!callback) {
+      callback = options;
+    }
+    if (!endsWith(couch_root_url, '/')) {
+      couch_root_url += '/';
+    }
     var opts = app.process_options(options),
         dashboad_db_url = url.resolve(couch_root_url, opts.dashboard_db_name),
         current_app_settings,
